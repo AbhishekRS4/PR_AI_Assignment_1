@@ -1,1 +1,1 @@
-# PR_AI_Assignment_1
+# Pattern Recognition for AI - Assignment 1
