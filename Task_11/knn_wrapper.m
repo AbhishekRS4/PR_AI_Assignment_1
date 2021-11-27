@@ -4,12 +4,12 @@ load task_11.mat;
 K=7;
 samples=64;
 data = task_11;
-nr_of_classes = 2;
+nr_of_classes = 4;
 
 
 % Class labels
 class_labels = floor( (0:length(data)-1) * nr_of_classes / length(data) );
-
+disp(class_labels);
 % Sample the parameter space
 result=zeros(samples);
 for i=1:samples
@@ -29,8 +29,10 @@ title([int2str(K) '-NN, ' int2str(nr_of_classes) ' classes']);
 
 % this is only correct for the first question
 scaled_data=samples*data;
-plot(scaled_data(  1:100,1),scaled_data(  1:100,2),'go');
-plot(scaled_data(101:200,1),scaled_data(101:200,2),'r+');
+plot(scaled_data(  1:50,1),scaled_data(  1:50,2),'go');
+plot(scaled_data(  51:100,1),scaled_data(  51:100,2),'y*');
+plot(scaled_data(101:150,1),scaled_data(101:150,2),'r+');
+plot(scaled_data(151:200,1),scaled_data(151:200,2),'bd');
 
 
 
