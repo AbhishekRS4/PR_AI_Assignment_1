@@ -2,7 +2,7 @@ function roc_1()
     num_values = 20;
     mu_1 = 5;
     mu_2_list = [7, 9, 11];
-    colors_list = ['r', 'g', 'b'];
+    colors_list = ["r", "g", "b"];
     variance = 4;
     std_dev = sqrt(variance);
     size_pdfs = size(mu_2_list);
@@ -25,31 +25,31 @@ function roc_1()
         total_good = sum(good_pdf);
         total_bad = sum(bad_pdf);
         
-        cum_hits = 0;
-        cum_fa = 0;
+        cum_TPR = 0;
+        cum_FPR = 0;
         
-        hits_list = zeros(1, num_values);
-        fa_list = zeros(1, num_values);
+        TPR_list = zeros(1, num_values);
+        FPR_list = zeros(1, num_values);
         
         for index_values=1:num_values
             if bad_pdf(index_values) > 0
-                cum_fa = cum_fa + good_pdf(num_values - index_values + 1);
-                cum_hits = cum_hits + bad_pdf(num_values - index_values + 1);
+                cum_FPR = cum_FPR + good_pdf(num_values - index_values + 1);
+                cum_TPR = cum_TPR + bad_pdf(num_values - index_values + 1);
                 
             end
-            fa = cum_fa / total_good;
-            hit = cum_hits / total_bad;
+            FPR = cum_FPR / total_good;
+            TPR = cum_TPR / total_bad;
             
-            fa_list(index_values) = fa;
-            hits_list(index_values) = hit;
+            FPR_list(index_values) = FPR;
+            TPR_list(index_values) = TPR;
         end
         legend_str = "\mu_1=5, \mu_2="+mu_2+", \sigma="+std_dev+", discriminability="+discrimi;
-        plot(fa_list, hits_list, colors_list(index_pdfs), "DisplayName", legend_str);
+        plot(FPR_list, TPR_list, colors_list(index_pdfs), "DisplayName", legend_str);
     end
-    legend('Location', 'Best');
+    legend("Location", "Best");
     title("ROC Curve");
-    xlabel("false alarms");
-    ylabel("hits")
+    xlabel("FPR");
+    ylabel("TPR")
 end
 
 function discrimi=compute_discriminability(mu_1, mu_2, std_dev)
