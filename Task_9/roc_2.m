@@ -56,7 +56,7 @@ function roc_1(FPR_rate, TPR_rate, discrimi)
     plot(FPR_list, TPR_list, "DisplayName", legend_str);
     
     legend_str = "FPR="+FPR_rate+", TPR="+TPR_rate;
-    plot(FPR_rate, TPR_rate, "bx", "DisplayName", legend_str);
+    plot(FPR_rate, TPR_rate, "rx", "DisplayName", legend_str);
     legend("Location", "Best");
     title("ROC Curve");
     xlabel("FPR");
