@@ -7,7 +7,7 @@ function sub_task_4_hough_circles()
     radius_min = 20;
     radius_max = 40;
     
-    [centers, radii, metric] = imfindcircles(img_contrast_enhanced,[radius_min radius_max], 'Sensitivity', 0.9);
+    [centers, radii, metric] = imfindcircles(img_contrast_enhanced,[radius_min radius_max], 'Sensitivity', 0.932);
     %display(centers);
     figure(1);
     imshow(img_contrast_enhanced);
