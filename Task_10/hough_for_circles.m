@@ -1,4 +1,4 @@
-function sub_task_4_hough_circles()
+function hough_for_circles()
     img = imread('HeadTool0002.bmp');
     img_double = im2double(img);
     
@@ -15,7 +15,7 @@ function sub_task_4_hough_circles()
     title('All circles found');
 
     num_strong = 2;
-    centers_strong_2 = centers(1:num_strong,:); 
+    centers_strong_2 = centers(1:num_strong, :); 
     radii_strong_2 = radii(1:num_strong);
     metric_strong_2 = metric(1:num_strong);
     

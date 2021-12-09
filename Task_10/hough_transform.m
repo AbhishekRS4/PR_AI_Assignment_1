@@ -1,64 +1,77 @@
-function sub_task_1_hough()
+function hough_transform()
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    %%% read and show image
+    %%%%%%%%%%%%%%%%%%%%%%%%
     img = imread('Cameraman.tiff');
-    % display(size(img));
     figure(1);
     imshow(img);
     title("Original Cameraman image");
-    %pause(2);
     
+    %%%%%%%%%%%%%%%%%%%%%%%%
+    %%% show canny edge map
+    %%%%%%%%%%%%%%%%%%%%%%%%
     canny_edge_map = edge(img, 'canny');
     figure(2);
     imshow(canny_edge_map);
     title("Canny edge detection output for Cameraman image");
-    %pause(2);
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% compute hough transform using canny edge map and show hough space
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     [H, theta, rho] = hough(canny_edge_map);
     figure(3);
     imshow(imadjust(rescale(H)), 'XData', theta, 'YData', rho, 'InitialMagnification', 'fit');
     title('Hough Transform for Cameraman image');
-    xlabel('\theta')
+    xlabel('\theta');
     ylabel('\rho');
     axis on, axis normal;
     colormap(gca, hot);
     
-    %fprintf('min H : %d\n', min(H));
-    %fprintf('max H : %d\n', max(H));
-    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% threshold the hough space and show the thresholded hough space
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     threshold = 20;
     H_threshold_true = (H >= threshold);
     H_thresholded = H .* H_threshold_true;
     
-    %fprintf('min H : %d\n', min(H_thresholded));
-    %fprintf('max H : %d\n', max(H_thresholded));
-    %display(size(H));
-    %display(size(H_thresholded));
-    
     figure(4);
     imshow(imadjust(rescale(H_thresholded)), 'XData', theta, 'YData', rho, 'InitialMagnification', 'fit');
     title('Thresholded Hough Transform for Cameraman image');
-    xlabel('\theta')
+    xlabel('\theta');
     ylabel('\rho');
     axis on, axis normal;
     colormap(gca, hot);
     
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% show 5 peaks along for the thresholded hough space
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     peaks = houghpeaks(H_thresholded, 5);
     figure(5);
     imshow(H_thresholded, [], 'XData', theta, 'YData', rho, 'InitialMagnification', 'fit');
     title('Thresholded Hough Transform with 5 strongest local maxima for Cameraman image');
-    xlabel('\theta')
+    xlabel('\theta');
     ylabel('\rho');
     axis on, axis normal, hold on;
     colormap(gca, hot);
     x = theta(peaks(:, 2)); y = rho(peaks(:, 1));
     plot(x, y, 's', 'color', 'white');
     
-    myhougline(img, theta, rho, peaks);
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% draw the strongest line on the image
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    peaks = houghpeaks(H_thresholded, 1);
+    draw_hough_line(img, theta, rho, peaks);
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %%% myhoughline TBD
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    
 end
 
-function myhougline(img, theta, rho, peaks)
+function draw_hough_line(img, theta, rho, peaks)
     lines = houghlines(img, theta, rho, peaks, 'FillGap', 5, 'MinLength', 7);
     figure(6), imshow(img), hold on;
-    title('Cameraman image overlaid with lines');
+    title('Cameraman image overlaid with strongest line');
     max_len = 0;
     for k = 1:length(lines)
        xy = [lines(k).point1; lines(k).point2];
