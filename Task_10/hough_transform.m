@@ -62,10 +62,6 @@ function hough_transform()
     peaks = houghpeaks(H_thresholded, 1);
     draw_hough_line(img, theta, rho, peaks);
     
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %%% myhoughline TBD
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    
 end
 
 function draw_hough_line(img, theta, rho, peaks)
