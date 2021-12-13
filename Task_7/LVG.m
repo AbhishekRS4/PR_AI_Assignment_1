@@ -63,7 +63,7 @@ function errors = VQL(matA,matB,n_prototypesA, n_prototypesB,learningRate)
                 prototypesA(index,:) = prototypesA(index,:) + learningRate*direction; 
             end   
         end
-        errors(i) = calculateError(prototypesA,prototypesB,matA,matB);
+        errors(i) = calculateError(prototypesA,prototypesB,matA,matB) / 200;
         if errors(i) < lowestError
             lowestError = errors(i);
             noChange = 0;
@@ -74,9 +74,9 @@ function errors = VQL(matA,matB,n_prototypesA, n_prototypesB,learningRate)
             break
         end
     end
+
     showScatterGraph(matA,matB,prototypesA,prototypesB);
 end
-
 function showScatterGraph(matA,matB,prototypesA,prototypesB)
     classAtrue_x= [];
     classAfalse_x = [];
@@ -125,6 +125,8 @@ function showScatterGraph(matA,matB,prototypesA,prototypesB)
     scatter(prototypesB(:,1),prototypesB(:,2),150,'d','MarkerEdgeColor',[0 0 0],...
                   'MarkerFaceColor',[0 0 1],...
                   'LineWidth',3)
+    xlabel('Epoch')
+    ylabel('E')
     legend('class A classified as A', 'class A classified as B','class B classified as A','class B classified as B','Prototypes for class A', 'Prototypes for class B')
     hold off
 end

@@ -3,43 +3,41 @@ load data_lvq_A.mat;
 load data_lvq_B.mat;
 
 learningRate = 0.01;
-global experiment_number;
-experiment_number = 1;
+n_folds = 10;
+training_errors = zeros(1,n_folds);
+test_errors = zeros(1,n_folds);
 
-Errors_1_1 = VQL(matA,matB,1, 1,learningRate);
-experiment_number = experiment_number + 1;
-Errors_1_2 = VQL(matA,matB,1, 2,learningRate);
-experiment_number = experiment_number + 1;
-Errors_2_1 = VQL(matA,matB,2, 1,learningRate);
-experiment_number = experiment_number + 1;
-Errors_2_2 = VQL(matA,matB,2, 2,learningRate);
-experiment_number = experiment_number + 1;
+matA = matA(randperm(size(matA,1)),:);
+matB = matB(randperm(size(matB,1)),:);
 
-figure(experiment_number);
-plot(1:length(Errors_1_1),Errors_1_1);
-hold on
-plot(1:length(Errors_1_2),Errors_1_2);
-hold on
-plot(1:length(Errors_2_1),Errors_2_1);
-hold on
-plot(1:length(Errors_2_2),Errors_2_2);
-hold on
+for i = 1:n_folds
+    n_per_fold = length(matA) / n_folds;
+    AData = cat(1,matA(1:(i-1)*n_per_fold,:),matA(i*n_per_fold:length(matA),:));
+    BData = cat(1,matB(1:(i-1)*n_per_fold,:),matB(i*n_per_fold:length(matB),:));
+    ATest = matA((i-1)*n_per_fold+1:i*n_per_fold,:);
+    BTest = matB((i-1)*n_per_fold+1:i*n_per_fold,:);
+    [training_errors(i), test_errors(i)] = VQL(AData,BData,2, 1,learningRate, ATest, BTest);
+end
 
 
-legend('One A-prototype, One B-Prototype','One A-prototype, Two B-Prototype','Two A-prototype, One B-Prototype','Two A-prototype, Two B-Prototype');
-hold off
+bar(training_errors);
+yline(mean(test_errors),'-','Mean test errors','LineWidth',2);
+text(1:length(training_errors),training_errors,num2str(training_errors'),'vert','bottom','horiz','center'); 
+xlabel('k') 
+ylabel('Error in %') 
+box off
+test_errors
+mean(test_errors)
 
-function errors = VQL(matA,matB,n_prototypesA, n_prototypesB,learningRate)
+
+function [training_error, test_error] = VQL(matA,matB,n_prototypesA, n_prototypesB,learningRate, ATest, BTest)
     lowestError = inf;
     noChange = 0;
     maxEpochs = 300;
-    n_prototypesA
-    n_prototypesB
-    errors = [];
     allData = cat(1,matA,matB);
     [prototypesA, prototypesB] =  initPrototypes(n_prototypesA, n_prototypesB, allData );
     for i=1:maxEpochs
-        for j=1:100
+        for j=1:length(matA)
             [class,index] =  classClosedPrototype(matA(j,:),prototypesA,prototypesB);
             if class == 'A'
                 direction = matA(j,:) - prototypesA(index,:);
@@ -51,7 +49,7 @@ function errors = VQL(matA,matB,n_prototypesA, n_prototypesB,learningRate)
                 prototypesB(index,:) = prototypesB(index,:) + learningRate*direction; 
             end   
         end
-        for j=1:100
+        for j=1:length(matB)
             [class,index] =  classClosedPrototype(matB(j,:),prototypesA,prototypesB);
             if class == 'B'
                 direction = matB(j,:) - prototypesB(index,:);
@@ -63,9 +61,11 @@ function errors = VQL(matA,matB,n_prototypesA, n_prototypesB,learningRate)
                 prototypesA(index,:) = prototypesA(index,:) + learningRate*direction; 
             end   
         end
-        errors(i) = calculateError(prototypesA,prototypesB,matA,matB);
-        if errors(i) < lowestError
-            lowestError = errors(i);
+
+        error = calculateError(prototypesA,prototypesB,matA,matB);
+ 
+        if error < lowestError
+            lowestError = error;
             noChange = 0;
         else
             noChange = noChange +1;
@@ -74,70 +74,19 @@ function errors = VQL(matA,matB,n_prototypesA, n_prototypesB,learningRate)
             break
         end
     end
-    showScatterGraph(matA,matB,prototypesA,prototypesB);
-end
-
-function showScatterGraph(matA,matB,prototypesA,prototypesB)
-    classAtrue_x= [];
-    classAfalse_x = [];
-    classBtrue_x = [];
-    classBfalse_x = [];
-    classAtrue_y = [];
-    classAfalse_y = [];
-    classBtrue_y = [];
-    classBfalse_y = [];
-    for j=1:100
-        [class,~] =  classClosedPrototype(matA(j,:),prototypesA,prototypesB);
-        if class == 'A'
-            classAtrue_x(end+1) = matA(j,1);
-            classAtrue_y(end+1) = matA(j,2);
-        else
-            classAfalse_x(end+1) = matA(j,1);
-            classAfalse_y(end+1) = matA(j,2);
-        end   
-    end
-    for j=1:100
-        [class,~] =  classClosedPrototype(matB(j,:),prototypesA,prototypesB);
-        if class == 'A'
-            classBfalse_x(end+1) = matB(j,1);
-            classBfalse_y(end+1) = matB(j,2);
-        else
-            classBtrue_x(end+1) = matB(j,1);
-            classBtrue_y(end+1) = matB(j,2);
-        end      
-    end
-    
-    global experiment_number
-    figure(experiment_number);
-    scatter(classAtrue_x, classAtrue_y,'MarkerFaceColor',[1 0 0]);
-    hold on
-    scatter(classAfalse_x, classAfalse_y,'d','MarkerFaceColor',[1 0 0]);
-    hold on
-    scatter(classBfalse_x, classBfalse_y,'MarkerFaceColor',[0 0 1]);
-    hold on
-    scatter(classBtrue_x, classBtrue_y,'d','MarkerFaceColor',[0 0 1]);
-    hold on
-    
-    scatter(prototypesA(:,1),prototypesA(:,2),150,'MarkerEdgeColor',[0 0 0],...
-                  'MarkerFaceColor',[1 0 0],...
-                  'LineWidth',3)
-    hold on
-    scatter(prototypesB(:,1),prototypesB(:,2),150,'d','MarkerEdgeColor',[0 0 0],...
-                  'MarkerFaceColor',[0 0 1],...
-                  'LineWidth',3)
-    legend('class A classified as A', 'class A classified as B','class B classified as A','class B classified as B','Prototypes for class A', 'Prototypes for class B')
-    hold off
+    training_error = round( (calculateError(prototypesA,prototypesB, matA, matB) / (length(matA) + length(matB)) ) * 100 , 2);
+    test_error = round((calculateError(prototypesA,prototypesB, ATest, BTest) / (length(ATest) + length(ATest)) ) * 100 , 2);
 end
 
 function error = calculateError(prototypesA,prototypesB,dataA,dataB)
     error = 0;
-    for i=1:100
+    for i=1:length(dataA)
         [class,~] = classClosedPrototype(dataA(i,:),prototypesA,prototypesB);
         if class == 'B'
             error = error + 1;
         end
     end 
-    for i=1:100
+    for i=1:length(dataB)
         [class,~] = classClosedPrototype(dataB(i,:),prototypesA,prototypesB);
         if class == 'A'
             error = error + 1;
@@ -180,6 +129,8 @@ function [prototypesA, prototypesB] =  initPrototypes(n_prototypesA, n_prototype
         prototypesB(i,2) = mean_y + se_y*randn();
     end
 end
+
+%}
 
 
 
