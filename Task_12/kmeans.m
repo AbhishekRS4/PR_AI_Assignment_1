@@ -66,7 +66,7 @@ quantizationError = 0;
 for i=1:length(data)
     quantizationError = quantizationError + sum((data(i, :)-means(labels(i), :)).^2);
 end
-quantizationError
+disp(quantizationError);
 
 
 if plotFlag == true
@@ -77,21 +77,28 @@ if plotFlag == true
     Y = data(:, 2);
     nexttile;
     hold on;
+    clustermeans1 = plot(means(:, 1), means (:, 2), 'kp');
     for i =1:K
         plot(X(labels == i), Y(labels == i), colors{i});
     end
-    plot(means(:, 1), means (:, 2), 'kp');
+    title(['classification map for ' int2str(K) '-NN']);
+%     axis([-6 10 -4 3]);
+    legend({'cluster means', 'class 1', 'class 2', 'class 3', 'class 4', 'class 5', 'class 6', 'class 7', 'class 8'}, 'position', [0.4 0.14 1 1]);
+    uistack(clustermeans1, 'top');
 
     nexttile;
     hold on;
+    clsutermeans1 = plot(means(:, 1), means (:, 2), 'kp');
     for i=1:K
         for j=1:(counter-1)
             plot_arrow(historicalMeans(i,1,j), historicalMeans(i,2,j) ,historicalMeans(i,1,j+1), historicalMeans(i,2,j+1));
         end
     end
-    plot(means(:, 1), means (:, 2), 'kp');
-    % axis([-6 8 -4 3]);
-    % exportgraphics(t,'12-1-8.pdf')
+    title(['cluster mean trajectories for ' int2str(K) '-NN']);
+    axis([-6 8 -4 3]);
+    legend('cluster means');
+    uistack(clustermeans1, 'top');
+    exportgraphics(t,'12-1-2.pdf');
 end
 
 

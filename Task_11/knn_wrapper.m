@@ -9,7 +9,6 @@ nr_of_classes = 4;
 
 % Class labels
 class_labels = floor( (0:length(data)-1) * nr_of_classes / length(data) );
-disp(class_labels);
 % Sample the parameter space
 result=zeros(samples);
 for i=1:samples
@@ -20,24 +19,23 @@ for i=1:samples
   end;
 end;
 
-% result(j,i) = KNN([0 0],K,data,class_labels);
 
 % Show the results in a figure
-imshow(result,[0 nr_of_classes-1],'InitialMagnification','fit')
+imshow(result,[0 nr_of_classes-1],'InitialMagnification','fit');
 hold on;
 title([int2str(K) '-NN, ' int2str(nr_of_classes) ' classes']);
-
-% this is only correct for the first question
 scaled_data=samples*data;
-plot(scaled_data(  1:50,1),scaled_data(  1:50,2),'go');
-plot(scaled_data(  51:100,1),scaled_data(  51:100,2),'y*');
-plot(scaled_data(101:150,1),scaled_data(101:150,2),'r+');
-plot(scaled_data(151:200,1),scaled_data(151:200,2),'bd');
+if nr_of_classes == 2
+    plot(scaled_data(  1:100,1),scaled_data(  1:100,2),'go');
+    plot(scaled_data(  101:200,1),scaled_data(  101:200,2),'r+');
+end
+if nr_of_classes == 4
+    plot(scaled_data(  1:50,1),scaled_data(  1:50,2),'go');
+    plot(scaled_data(  51:100,1),scaled_data(  51:100,2),'y*');
+    plot(scaled_data(101:150,1),scaled_data(101:150,2),'r+');
+    plot(scaled_data(151:200,1),scaled_data(151:200,2),'bd');
+end
 
-
-
-% score = leave_one_out_cross_validation(data, class_labels, K);
-% disp(score);
 
 maxScore = 0;
 maxK = 0;
